@@ -1,0 +1,16 @@
+body {
+    background: #F5F7FB;
+    margin: 0;
+}
+
+.blob1 {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.blob2 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
