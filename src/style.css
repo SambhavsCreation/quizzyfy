@@ -3,13 +3,13 @@ body {
     margin: 0;
 }
 
-.blob1 {
+.blob-1 {
     position: absolute;
     top: 0;
     right: 0;
 }
 
-.blob2 {
+.blob-2 {
     position: absolute;
     bottom: 0;
     left: 0;

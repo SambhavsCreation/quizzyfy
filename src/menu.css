@@ -1,0 +1,35 @@
+.main-menu {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 17%;
+}
+
+.main-menu-heading {
+    font-size: 50px;
+    color: #293264;
+    font-family: 'Karla', sans-serif;
+    margin-bottom: 0;
+}
+
+.main-menu-info {
+    font-family: 'inter', sans-serif;
+    color: #2b4798;
+}
+
+.main-menu-button {
+    height: 70px;
+    width: 200px;
+    border: none;
+    border-radius: 20px;
+    background-color: #4D5B9E;
+}
+
+.main-menu-button-text {
+    font-family: 'inter', sans-serif;
+    color: #F5F7FB;
+    font-size: 30px;
+    margin-top: 15px;
+    font-weight: 300;
+}
