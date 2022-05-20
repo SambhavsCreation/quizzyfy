@@ -24,6 +24,7 @@
     border: none;
     border-radius: 20px;
     background-color: #4D5B9E;
+    cursor: pointer;
 }
 
 .main-menu-button-text {

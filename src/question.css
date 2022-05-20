@@ -1,0 +1,25 @@
+.question-container {
+    margin: 70px 200px 70px 200px;
+    border-bottom: solid 1px #DBDEF0;
+    padding-bottom: 20px;
+}
+
+.question-title {
+    font-family: 'Karla', sans-serif;
+    color: #293264;
+    font-size: 30px;
+}
+
+.question-option {
+    margin-right: 15px;
+    height: 30px;
+    border: solid 1px #293264;
+    border-radius: 15px;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.question-option-data {
+    margin: auto 15px auto 15px;
+    color: #293264;
+}
