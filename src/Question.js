@@ -11,12 +11,12 @@ export default function Question(props)
             isSelected: isSelectedX,
             value: valueX,
             isCorrect: isCorrectX,
+            style: {backgroundColor: 'transparent'},
             id: nanoid()
         })
     }
     function createOptions()
     {
-        console.log("I shouldnt be called")
 
         let temp = []
         for (let i = 0; i < 4; i++)
@@ -40,29 +40,69 @@ export default function Question(props)
         }
         return temp
     }
-    const [options, setOptions] = React.useState(createOptions())
 
-    const [optionElements, setOptionElements] = React.useState(options.map(x => {
+    const [options, setOptions] = React.useState(createOptions(true, "xyz", false))
+
+
+    const optionElements = options.map((x, i) => {
         return (
-            <Options optionText={x.value} clicked={() => handleOptionClick(x['id'])} isSelected={x.isSelected}></Options>
+            <Options optionText={x.value} clicked={() => handleOptionClick(x['id'])} key={nanoid()} optionProps={options[i]}></Options>
         )
-    }))
+    })
 
+
+    //console.log(props.isSelected)
+
+
+
+
+    function getSelectedOption()
+    {
+        let selectedOptionX
+        for (let i = 0; i < 4; i++) {
+            if (options[i]['isSelected'] === true) {
+                selectedOptionX = options[i]['value']
+            }
+        }
+        return selectedOptionX
+    }
     function handleOptionClick(id)
     {
-        setOptions(x => x.map(y => {
-            y['id'] === id ? console.log(!y.isSelected) : console.log("pls")
-            return y['id'] === id ?
-                {...y, isSelected: !y.isSelected} :
-                y
-        }))
-        console.log(options)
-        setOptionElements(options.map(x => {
-            return (
-                <Options optionText={x.value} clicked={() => handleOptionClick(x['id'])} isSelected={x.isSelected}></Options>
-            )
-        }))
+        if (!props.isGameOver)
+        {
+            setOptions(x => x.map(y => {
+                if (y.isSelected === true) {
+                    y.isSelected = false
+                    return {...y, style: {backgroundColor: 'transparent'}}
+                }
+
+                return y['id'] === id ?
+                    {...y, isSelected: !y.isSelected, style: {backgroundColor: '#D6DBF5'}} :
+                    y
+            }))
+        }
     }
+
+    React.useEffect(() => {
+        props.selectedOption(props.question, getSelectedOption())
+        console.log(options)
+    })
+
+    // function compileResults()
+    // {
+    //     let selectedOptionX
+    //     for (let i = 0; i < 4; i++)
+    //     {
+    //         if (options[i]['isSelected'] === true) {
+    //             selectedOptionX = options[i]['value']
+    //         }
+    //     }
+    //     return ({
+    //         question: props.question,
+    //         selectedOption: selectedOptionX,
+    //         correctOption: props.correctOption
+    //     })
+    // }
 
     return (
         <div className="question-container">

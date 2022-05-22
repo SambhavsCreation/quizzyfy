@@ -14,3 +14,21 @@ body {
     bottom: 0;
     left: 0;
 }
+
+.submit-button {
+    margin-bottom: 70px;
+    height: 70px;
+    width: 200px;
+    border: none;
+    border-radius: 20px;
+    background-color: #4D5B9E;
+    cursor: pointer;
+}
+
+.submit-button-text {
+    font-family: 'inter', sans-serif;
+    color: #F5F7FB;
+    font-size: 30px;
+    margin-top: 15px;
+    font-weight: 300;
+}
