@@ -13,66 +13,48 @@ import './menu.css'
 
 export default function App()
 {
-    const [loading, setLoading] = React.useState(false)
-    const questionElements = []
+    const [loading, setLoading] = React.useState(true)
     const [isGameOver, setIsGameOver] = React.useState(false)
-    let canEditQ = isGameOver
+    const [quizData, setQuizData] = React.useState([{}])
+    const [finalValues, setFinalValues] = React.useState([{}])
+    let score = 0
+    const [scoreState, setScoreState] = React.useState(score)
+    const [menu, setMenu] = React.useState(true)
 
-    React.componentDidMount(() => {
+    let questionElements
+
+    React.useEffect(() => {
+        // fetch("https://opentdb.com/api.php?amount=5&category=9&difficulty=medium&type=multiple")
+        //     .then(res => res.json())
+        //     .then(data => setQuizData(data['results']))
+        if (isGameOver)
+        {
+            return
+        }
         setLoading(true)
+        fetch("https://opentdb.com/api.php?amount=5&category=9&difficulty=medium&type=multiple")
+            .then(res => res.json())
+            .then(data => setQuizData(data['results']))
+            .then(() => {
+                setLoading(false)
+            })
+        console.log("running APP effect")
 
-    })
+    }, [isGameOver])
+
 
     function StartQuiz()
     {
         setMenu(false)
         setIsGameOver(false)
-        canEditQ = true
 
         setFinalValues(makeFinalValues())
-        // let temp = (makeQuestions().map(y => {
-        //     return (
-        //         <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={isGameOver} ></Question>
-        //     )
-        // }))
+        // let temp =
         // questionElements.push(temp[0])
 
-        console.log(questionElements)
+
+
     }
-    function populateQuizElements()
-    {
-        let temp = (makeQuestions().map(y => {
-            return (
-                <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={isGameOver} ></Question>
-            )
-        }))
-        for (let i = 0; i < 5; i++)
-        {
-            questionElements.push(temp[i])
-        }
-        return undefined
-    }
-    // function getQuestionElements()
-    // {
-    //     return (makeQuestions().map(y => {
-    //         return (
-    //             <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={isGameOver} ></Question>
-    //         )
-    //     }))
-    // }
-
-    const [quizData, setQuizData] = React.useState([{}])
-
-
-    React.useEffect(() => {
-        fetch("https://opentdb.com/api.php?amount=5&category=9&difficulty=medium&type=multiple")
-            .then(res => res.json())
-            .then(data => setQuizData(data['results']))
-            .then(() => {
-                populateQuizElements()
-            })
-    }, [isGameOver])
-
 
     function makeQuestion(dataID) {
         const str = quizData[dataID]['question'].replace(/&quot;/g, '"').replace(/&#039;/g, "'")
@@ -80,7 +62,8 @@ export default function App()
         return ({
             text: str,
             incorrectOptions: quizData[dataID]['incorrect_answers'],
-            correctOption: quizData[dataID]['correct_answer']
+            correctOption: quizData[dataID]['correct_answer'],
+            gameOver: isGameOver
         })
     }
 
@@ -95,7 +78,6 @@ export default function App()
 
     // on quiz submit
 
-    const [finalValues, setFinalValues] = React.useState([{}])
     function makeFinalValue(dataID)
     {
         const str = quizData[dataID]['question'].replace(/&quot;/g, '"').replace(/&#039;/g, "'")
@@ -140,8 +122,6 @@ export default function App()
         return temp
     }
 
-    let score = 0
-    const [scoreState, setScoreState] = React.useState(score)
     function handleSubmit()
     {
         for (let i = 0; i < 5; i++)
@@ -151,8 +131,6 @@ export default function App()
                 score++
             }
         }
-        console.log(finalValues)
-        console.log(score)
         setIsGameOver(true)
         setScoreState(score)
     }
@@ -165,22 +143,24 @@ export default function App()
             StartQuiz()
         }
     }
-    canEditQ = isGameOver
-    console.log(canEditQ)
 
-    const [menu, setMenu] = React.useState(true)
+    if (!loading)
+    {
+        questionElements = (makeQuestions().map(y => {
+            return (
+                <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={y['gameOver']} ></Question>
+            )
+        }))
+    }
 
-    console.log(questionElements)
     return (
         <div>
             <img src={require("./assets/blob 5.png")} alt="null" className="blob-1"/>
             <img src={require("./assets/blob 6.png")} alt="null" className="blob-2"/>
-            {menu ? (<Menu menuChangeFunction={StartQuiz}></Menu>) : (<div>{questionElements}
-                {isGameOver ? (<EndGame score={scoreState} restart={restart}></EndGame>) :
-                    (<center><button className="submit-button" onClick={handleSubmit}><p className="submit-button-text">Submit</p></button></center>)
-                }
+            {loading ? (<h1>loading</h1>) : (menu ? (<Menu menuChangeFunction={StartQuiz}></Menu>) : (<div>{questionElements}                    {isGameOver ? (<EndGame score={scoreState} restart={restart}></EndGame>) :
+                (<center><button className="submit-button" onClick={handleSubmit}><p className="submit-button-text">Submit</p></button></center>)
+            }</div>))}
 
-            </div>)}
         </div>
     )
 }

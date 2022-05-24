@@ -17,7 +17,6 @@ export default function Question(props)
     }
     function createOptions()
     {
-
         let temp = []
         for (let i = 0; i < 4; i++)
         {
@@ -38,6 +37,7 @@ export default function Question(props)
                 tempInt++
             }
         }
+        console.log("createOptions called")
         return temp
     }
 
@@ -80,14 +80,15 @@ export default function Question(props)
                     {...y, isSelected: !y.isSelected, style: {backgroundColor: '#D6DBF5'}} :
                     y
             }))
+            props.selectedOption(props.question, getSelectedOption())
         }
     }
 
-    console.log(props.isGameOver)
 
-    React.useEffect(() => {
-        props.selectedOption(props.question, getSelectedOption())
-    })
+    // React.useEffect(() => {
+    //
+    //     console.log("question effect")
+    // })
 
     // function compileResults()
     // {
