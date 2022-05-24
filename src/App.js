@@ -13,32 +13,64 @@ import './menu.css'
 
 export default function App()
 {
-    const [questionElements, setQuestionElements] = React.useState([])
+    const [loading, setLoading] = React.useState(false)
+    const questionElements = []
+    const [isGameOver, setIsGameOver] = React.useState(false)
+    let canEditQ = isGameOver
 
+    React.componentDidMount(() => {
+        setLoading(true)
+
+    })
 
     function StartQuiz()
     {
         setMenu(false)
         setIsGameOver(false)
-        setQuestionElements(makeQuestions().map(y => {
+        canEditQ = true
+
+        setFinalValues(makeFinalValues())
+        // let temp = (makeQuestions().map(y => {
+        //     return (
+        //         <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={isGameOver} ></Question>
+        //     )
+        // }))
+        // questionElements.push(temp[0])
+
+        console.log(questionElements)
+    }
+    function populateQuizElements()
+    {
+        let temp = (makeQuestions().map(y => {
             return (
                 <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={isGameOver} ></Question>
             )
         }))
-        setFinalValues(makeFinalValues())
-
-        console.log(quizData)
+        for (let i = 0; i < 5; i++)
+        {
+            questionElements.push(temp[i])
+        }
+        return undefined
     }
+    // function getQuestionElements()
+    // {
+    //     return (makeQuestions().map(y => {
+    //         return (
+    //             <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={isGameOver} ></Question>
+    //         )
+    //     }))
+    // }
 
     const [quizData, setQuizData] = React.useState([{}])
-    const [isGameOver, setIsGameOver] = React.useState(false)
 
 
     React.useEffect(() => {
         fetch("https://opentdb.com/api.php?amount=5&category=9&difficulty=medium&type=multiple")
             .then(res => res.json())
             .then(data => setQuizData(data['results']))
-        console.log("halo")
+            .then(() => {
+                populateQuizElements()
+            })
     }, [isGameOver])
 
 
@@ -133,9 +165,12 @@ export default function App()
             StartQuiz()
         }
     }
+    canEditQ = isGameOver
+    console.log(canEditQ)
 
     const [menu, setMenu] = React.useState(true)
 
+    console.log(questionElements)
     return (
         <div>
             <img src={require("./assets/blob 5.png")} alt="null" className="blob-1"/>

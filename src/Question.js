@@ -83,9 +83,10 @@ export default function Question(props)
         }
     }
 
+    console.log(props.isGameOver)
+
     React.useEffect(() => {
         props.selectedOption(props.question, getSelectedOption())
-        console.log(options)
     })
 
     // function compileResults()
