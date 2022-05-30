@@ -5,110 +5,15 @@ import './question.css'
 
 export default function Question(props)
 {
-    function createOption(isSelectedX, valueX, isCorrectX)
-    {
-        return ({
-            isSelected: isSelectedX,
-            value: valueX,
-            isCorrect: isCorrectX,
-            style: {backgroundColor: 'transparent'},
-            id: nanoid()
-        })
-    }
-    function createOptions()
-    {
-        let temp = []
-        for (let i = 0; i < 4; i++)
-        {
-            temp.push(createOption(false, 'x', false))
-        }
-        let tempInt = 0
-        let z = Math.floor(Math.random() * 4)
-        temp[z]['isCorrect'] = true
-        for (let i = 0; i < 4; i++)
-        {
-            if (temp[i]['isCorrect'] === true)
-            {
-                temp[i]['value'] = props.correctOption
-            }
-            else
-            {
-                temp[i]['value'] = props.incorrectOptions[tempInt]
-                tempInt++
-            }
-        }
-        console.log("createOptions called")
-        return temp
-    }
-
-    const [options, setOptions] = React.useState(createOptions(true, "xyz", false))
-
-
-    const optionElements = options.map((x, i) => {
+    let optionElements = props.props.options.map(x => {
         return (
-            <Options optionText={x.value} clicked={() => handleOptionClick(x['id'])} key={nanoid()} optionProps={options[i]}></Options>
+            <Options optionText={x.optionText} key={nanoid()} updateSelected={() => props.updateSelected(x.childID, props.props.id)} isGameOver={props.isGameOver} isCorrect={x.isCorrect} isSelected={x.isSelected}></Options>
         )
     })
 
-
-    //console.log(props.isSelected)
-
-
-
-
-    function getSelectedOption()
-    {
-        let selectedOptionX
-        for (let i = 0; i < 4; i++) {
-            if (options[i]['isSelected'] === true) {
-                selectedOptionX = options[i]['value']
-            }
-        }
-        return selectedOptionX
-    }
-    function handleOptionClick(id)
-    {
-        if (!props.isGameOver)
-        {
-            setOptions(x => x.map(y => {
-                if (y.isSelected === true) {
-                    y.isSelected = false
-                    return {...y, style: {backgroundColor: 'transparent'}}
-                }
-
-                return y['id'] === id ?
-                    {...y, isSelected: !y.isSelected, style: {backgroundColor: '#D6DBF5'}} :
-                    y
-            }))
-            props.selectedOption(props.question, getSelectedOption())
-        }
-    }
-
-
-    // React.useEffect(() => {
-    //
-    //     console.log("question effect")
-    // })
-
-    // function compileResults()
-    // {
-    //     let selectedOptionX
-    //     for (let i = 0; i < 4; i++)
-    //     {
-    //         if (options[i]['isSelected'] === true) {
-    //             selectedOptionX = options[i]['value']
-    //         }
-    //     }
-    //     return ({
-    //         question: props.question,
-    //         selectedOption: selectedOptionX,
-    //         correctOption: props.correctOption
-    //     })
-    // }
-
     return (
         <div className="question-container">
-            <h2 className="question-title">{props.question}
+            <h2 className="question-title">{props.props.question}
             </h2>
             {optionElements}
         </div>

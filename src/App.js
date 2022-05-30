@@ -16,12 +16,11 @@ export default function App()
     const [loading, setLoading] = React.useState(true)
     const [isGameOver, setIsGameOver] = React.useState(false)
     const [quizData, setQuizData] = React.useState([{}])
-    const [finalValues, setFinalValues] = React.useState([{}])
-    let score = 0
-    const [scoreState, setScoreState] = React.useState(score)
     const [menu, setMenu] = React.useState(true)
+    const [questionData, setQuestionData] = React.useState([{}])
+    const [score, setScore] = React.useState(0)
+    let questionElements = []
 
-    let questionElements
 
     React.useEffect(() => {
         // fetch("https://opentdb.com/api.php?amount=5&category=9&difficulty=medium&type=multiple")
@@ -43,124 +42,129 @@ export default function App()
     }, [isGameOver])
 
 
+
+    function makeOptions(data)
+    {
+        let options = data['incorrect_answers']
+        const len = options.push(data['correct_answer']) - 1
+        const rand = Math.floor(Math.random() * 4)
+        let temp = options[len]
+        options[len]  = options[rand]
+        options[rand] = temp
+
+        console.log(rand)
+
+        let finalOptions = []
+
+        console.log(options)
+        for (let i = 0; i < 4; i++)
+        {
+            finalOptions.push({
+                optionText: options[i],
+                isSelected: false,
+                isCorrect: data['correct_answer'] === options[i],
+                childID: nanoid()
+            })
+        }
+
+        return finalOptions
+    }
+
+    function makeQuestion(data)
+    {
+        return {
+            question: data['question'],
+            options: makeOptions(data),
+            id: nanoid()
+        }
+    }
+
+    function initQuizData()
+    {
+        let tempArr = []
+        for (let i = 0; i < 5; i++)
+        {
+            tempArr.push(makeQuestion(quizData[i]))
+        }
+        return tempArr
+    }
+
     function StartQuiz()
     {
         setMenu(false)
         setIsGameOver(false)
-
-        setFinalValues(makeFinalValues())
-        // let temp =
-        // questionElements.push(temp[0])
-
-
-
+        setQuestionData(initQuizData())
     }
-
-    function makeQuestion(dataID) {
-        const str = quizData[dataID]['question'].replace(/&quot;/g, '"').replace(/&#039;/g, "'")
-            .replace(/&rdquo;/, '”').replace(/&ldquo;/, '“')
-        return ({
-            text: str,
-            incorrectOptions: quizData[dataID]['incorrect_answers'],
-            correctOption: quizData[dataID]['correct_answer'],
-            gameOver: isGameOver
-        })
-    }
-
-    function makeQuestions() {
-        let temp = []
-        for (let i = 0; i < 5; i++)
-        {
-            temp.push(makeQuestion(i))
-        }
-        return temp
-    }
-
-    // on quiz submit
-
-    function makeFinalValue(dataID)
-    {
-        const str = quizData[dataID]['question'].replace(/&quot;/g, '"').replace(/&#039;/g, "'")
-            .replace(/&rdquo;/, '”').replace(/&ldquo;/, '“')
-        return ({
-            text: str,
-            correctOption: quizData[dataID]['correct_answer'],
-            selectedOption: undefined
-        })
-    }
-
-    function updateSelectedOption(question, selectedOption)
-    {
-        setFinalValues(x => x.map(y => {
-            if (y['text'] === question)
-            {
-                if (selectedOption === y['selectedOption']) {
-                    return y
-                }
-                else
-                {
-                    return ({
-                        ...y,
-                        selectedOption: selectedOption
-                    })
-                }
-            }
-            else
-            {
-                return y
-            }
-        }))
-    }
-
-    function makeFinalValues()
-    {
-        let temp = []
-        for (let i = 0; i < 5; i++)
-        {
-            temp.push(makeFinalValue(i))
-        }
-        return temp
-    }
-
-    function handleSubmit()
-    {
-        for (let i = 0; i < 5; i++)
-        {
-            if (finalValues[i]['correctOption'] === finalValues[i]['selectedOption'])
-            {
-                score++
-            }
-        }
-        setIsGameOver(true)
-        setScoreState(score)
-    }
-
-    // Restart Game
-    function restart()
-    {
-        if (isGameOver)
-        {
-            StartQuiz()
-        }
-    }
-
     if (!loading)
     {
-        questionElements = (makeQuestions().map(y => {
+        questionElements = questionData.map(x => {
             return (
-                <Question question={y['text']} incorrectOptions={y['incorrectOptions']} correctOption={y['correctOption']} key={nanoid()} selectedOption={updateSelectedOption} isGameOver={y['gameOver']} ></Question>
+                <Question props={x} key={nanoid()} updateSelected={updateSelectedOption} isGameOver={isGameOver}></Question>
             )
+        })
+    }
+
+    function updateSelectedOption(childID, parentID)
+    {
+        !isGameOver &&
+        setQuestionData(x => x.map((y) => {
+            if (y.id === parentID)
+            {
+                for (let i = 0; i < 4; i++)
+                {
+                    console.log(i)
+                    if (y.options[i].childID === childID)
+                    {
+                        y.options[i].isSelected = !y.options[i].isSelected
+                    }
+                    else
+                    {
+                        y.options[i].isSelected = false
+                    }
+                }
+            }
+            return y
         }))
     }
+
+    function incrementScore()
+    {
+        setScore(x => x+1)
+    }
+
+    function submitQuiz()
+    {
+        setIsGameOver(true)
+        for (let i = 0; i < 5; i++)
+        {
+            for (let j = 0; j < 4; j++)
+            {
+                if (questionData[i].options[j].isSelected === true && questionData[i].options[j].isCorrect === true)
+                {
+                    incrementScore()
+                    break
+                }
+            }
+        }
+    }
+
+    function restart()
+    {
+        console.log("restarting")
+        setIsGameOver(false)
+        StartQuiz()
+        setScore(0)
+    }
+
+    console.log(quizData)
 
     return (
         <div>
             <img src={require("./assets/blob 5.png")} alt="null" className="blob-1"/>
             <img src={require("./assets/blob 6.png")} alt="null" className="blob-2"/>
-            {loading ? (<h1>loading</h1>) : (menu ? (<Menu menuChangeFunction={StartQuiz}></Menu>) : (<div>{questionElements}                    {isGameOver ? (<EndGame score={scoreState} restart={restart}></EndGame>) :
-                (<center><button className="submit-button" onClick={handleSubmit}><p className="submit-button-text">Submit</p></button></center>)
-            }</div>))}
-
+            {loading ? (<h1>loading</h1>) : (menu ? (<Menu menuChangeFunction={StartQuiz}></Menu>) : (<div>{questionElements}{isGameOver ? (<EndGame restart={restart} score={score}></EndGame>) :
+                (<center><button className="submit-button" onClick={submitQuiz}><p className="submit-button-text">Submit</p></button></center>)}
+            </div>))}
         </div>
     )
 }
